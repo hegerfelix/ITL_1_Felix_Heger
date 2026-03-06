@@ -34,4 +34,26 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* dark mode disabled for clean modern light UI */
+/* @import '@ionic/angular/css/palettes/dark.system.css'; */
+
+// ── Global modern overrides ──────────────────────────────
+ion-tab-bar {
+  --background: #fff;
+  border-top: 1px solid #ededf5;
+  box-shadow: 0 -4px 20px rgba(108, 99, 255, 0.08);
+  padding-bottom: env(safe-area-inset-bottom);
+  height: 60px;
+}
+
+ion-tab-button {
+  --color: #aaa;
+  --color-selected: #6c63ff;
+}
+
+// Modern toast
+.modern-toast {
+  --border-radius: 14px;
+  --box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  font-weight: 600;
+}

@@ -3,6 +3,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const db = require('./models');
+const { passport } = require('./config/passport');
 
 const app = express();
 const PORT = 3000;
@@ -12,10 +13,13 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
+app.use(passport.initialize());
 
 // Routes
+const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
-app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', passport.authenticate('jwt', { session: false }), userRoutes);
 
 // Health check
 app.get('/', (req, res) => {

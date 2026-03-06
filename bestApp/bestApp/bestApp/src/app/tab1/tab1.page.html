@@ -1,17 +1,137 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Tab 1
-    </ion-title>
+<ion-header>
+  <ion-toolbar class="modern-toolbar">
+    <div class="header-inner">
+      <div class="header-left">
+        <div class="header-avatar">👥</div>
+        <div class="header-text">
+          <span class="header-title">User Manager</span>
+          <span class="header-sub">MySQL · Sequelize</span>
+        </div>
+      </div>
+      <button class="refresh-btn" (click)="loadUsers()">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </button>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="page-content">
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  <!-- Stats Row -->
+  <div class="stats-row" *ngIf="!loading && !errorMessage">
+    <div class="stat-pill">
+      <span class="stat-num">{{ users.length }}</span>
+      <span class="stat-lbl">Users</span>
+    </div>
+    <div class="stat-pill green">
+      <span class="stat-num">🟢</span>
+      <span class="stat-lbl">Connected</span>
+    </div>
+    <div class="stat-pill purple">
+      <span class="stat-num">REST</span>
+      <span class="stat-lbl">API :3000</span>
+    </div>
+  </div>
+
+  <!-- ── ADD FORM ── -->
+  <div class="section-title">
+    <span class="section-dot"></span> Add New User
+  </div>
+
+  <div class="glass-card">
+    <div class="field-group">
+      <label class="field-lbl">First Name <span class="req">*</span></label>
+      <ion-input class="field-input" [(ngModel)]="newUser.firstName"
+        placeholder="Max" [clearInput]="true"></ion-input>
+    </div>
+    <div class="field-group">
+      <label class="field-lbl">Last Name</label>
+      <ion-input class="field-input" [(ngModel)]="newUser.lastName"
+        placeholder="Mustermann" [clearInput]="true"></ion-input>
+    </div>
+    <div class="field-group">
+      <label class="field-lbl">Email <span class="req">*</span></label>
+      <ion-input class="field-input" [(ngModel)]="newUser.email"
+        type="email" placeholder="max@example.com" [clearInput]="true"></ion-input>
+    </div>
+    <button class="add-btn" (click)="addUser()">
+      <ion-icon name="person-add-outline"></ion-icon>
+      Add User
+    </button>
+  </div>
+
+  <!-- ── EDIT FORM ── -->
+  <div class="edit-glass-card" *ngIf="editingUser">
+    <div class="edit-top">
+      <span class="edit-title">✏️ Edit User #{{ editingUser.id }}</span>
+      <button class="close-btn" (click)="cancelEdit()">✕</button>
+    </div>
+    <div class="field-group">
+      <label class="field-lbl">First Name</label>
+      <ion-input class="field-input" [(ngModel)]="editingUser.firstName"></ion-input>
+    </div>
+    <div class="field-group">
+      <label class="field-lbl">Last Name</label>
+      <ion-input class="field-input" [(ngModel)]="editingUser.lastName"></ion-input>
+    </div>
+    <div class="field-group">
+      <label class="field-lbl">Email</label>
+      <ion-input class="field-input" [(ngModel)]="editingUser.email" type="email"></ion-input>
+    </div>
+    <div class="btn-row">
+      <button class="save-btn" (click)="saveEdit()">💾 Save</button>
+      <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ── LOADING ── -->
+  <div class="center-state" *ngIf="loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Loading from database…</p>
+  </div>
+
+  <!-- ── ERROR ── -->
+  <div class="error-banner" *ngIf="errorMessage && !loading">
+    <span class="error-icon">⚠️</span>
+    <div>
+      <strong>Backend not reachable</strong>
+      <p>{{ errorMessage }}</p>
+    </div>
+  </div>
+
+  <!-- ── USER LIST ── -->
+  <ng-container *ngIf="!loading && !errorMessage">
+    <div class="section-title">
+      <span class="section-dot purple"></span> All Users
+      <span class="count-badge">{{ users.length }}</span>
+    </div>
+
+    <div class="empty-state" *ngIf="users.length === 0">
+      <div class="empty-emoji">🙈</div>
+      <p>No users yet. Add one above!</p>
+    </div>
+
+    <div class="user-list">
+      <div class="user-row" *ngFor="let user of users; let i = index">
+        <div class="avatar" [style.background]="getAvatarColor(i)">
+          {{ user.firstName.charAt(0).toUpperCase() }}{{ user.lastName ? user.lastName.charAt(0).toUpperCase() : '' }}
+        </div>
+        <div class="user-details">
+          <span class="uname">{{ user.firstName }} {{ user.lastName }}</span>
+          <span class="uemail">{{ user.email }}</span>
+          <span class="uid">ID {{ user.id }}</span>
+        </div>
+        <div class="row-actions">
+          <button class="act-btn edit" (click)="startEdit(user)">
+            <ion-icon name="create-outline"></ion-icon>
+          </button>
+          <button class="act-btn del" (click)="deleteUser(user)">
+            <ion-icon name="trash-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div style="height: 40px;"></div>
 </ion-content>
