@@ -52,7 +52,12 @@
   text-transform: uppercase;
 }
 
-.refresh-btn {
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.refresh-btn, .logout-btn {
   width: 38px;
   height: 38px;
   border-radius: 12px;

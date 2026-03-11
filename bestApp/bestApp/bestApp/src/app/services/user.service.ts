@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { AuthService } from './auth.service';
 
 export interface User {
   id?: number;
@@ -15,21 +17,32 @@ export interface User {
 export class UserService {
   private apiUrl = 'http://localhost:3000/api/users';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(this.apiUrl);
+    return from(this.authService.getAuthHeaders()).pipe(
+      switchMap(headers => this.http.get<User[]>(this.apiUrl, { headers }))
+    );
   }
 
   createUser(user: User): Observable<User> {
-    return this.http.post<User>(this.apiUrl, user);
+    return from(this.authService.getAuthHeaders()).pipe(
+      switchMap(headers => this.http.post<User>(this.apiUrl, user, { headers }))
+    );
   }
 
   updateUser(id: number, user: User): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${id}`, user);
+    return from(this.authService.getAuthHeaders()).pipe(
+      switchMap(headers => this.http.put<User>(`${this.apiUrl}/${id}`, user, { headers }))
+    );
   }
 
   deleteUser(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return from(this.authService.getAuthHeaders()).pipe(
+      switchMap(headers => this.http.delete(`${this.apiUrl}/${id}`, { headers }))
+    );
   }
 }

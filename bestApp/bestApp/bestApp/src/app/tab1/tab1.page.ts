@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonContent,
   IonIcon, IonInput, IonSpinner,
@@ -9,9 +10,10 @@ import {
 import { addIcons } from 'ionicons';
 import {
   trashOutline, createOutline, personAddOutline,
-  refreshOutline, checkmarkOutline
+  refreshOutline, checkmarkOutline, logOutOutline
 } from 'ionicons/icons';
 import { UserService, User } from '../services/user.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-tab1',
@@ -44,10 +46,12 @@ export class Tab1Page implements OnInit {
 
   constructor(
     private userService: UserService,
+    private authService: AuthService,
     private toastCtrl: ToastController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private router: Router
   ) {
-    addIcons({ trashOutline, createOutline, personAddOutline, refreshOutline, checkmarkOutline });
+    addIcons({ trashOutline, createOutline, personAddOutline, refreshOutline, checkmarkOutline, logOutOutline });
   }
 
   ngOnInit() {
@@ -137,5 +141,26 @@ export class Tab1Page implements OnInit {
       cssClass: 'modern-toast'
     });
     await toast.present();
+  }
+
+  async logout() {
+    const alert = await this.alertCtrl.create({
+      header: 'Abmelden',
+      message: 'Möchtest du dich wirklich abmelden?',
+      buttons: [
+        {
+          text: 'Abbrechen',
+          role: 'cancel'
+        },
+        {
+          text: 'Abmelden',
+          handler: async () => {
+            await this.authService.logout();
+            this.router.navigate(['/login']);
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 }

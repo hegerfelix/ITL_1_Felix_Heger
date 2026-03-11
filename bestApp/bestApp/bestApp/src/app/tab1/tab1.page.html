@@ -8,9 +8,14 @@
           <span class="header-sub">MySQL · Sequelize</span>
         </div>
       </div>
-      <button class="refresh-btn" (click)="loadUsers()">
-        <ion-icon name="refresh-outline"></ion-icon>
-      </button>
+      <div class="header-actions">
+        <button class="refresh-btn" (click)="loadUsers()">
+          <ion-icon name="refresh-outline"></ion-icon>
+        </button>
+        <button class="logout-btn" (click)="logout()">
+          <ion-icon name="log-out-outline"></ion-icon>
+        </button>
+      </div>
     </div>
   </ion-toolbar>
 </ion-header>

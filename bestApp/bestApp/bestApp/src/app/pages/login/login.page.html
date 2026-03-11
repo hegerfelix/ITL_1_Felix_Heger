@@ -1,0 +1,56 @@
+<ion-content [fullscreen]="true" class="login-content">
+  <div class="login-container">
+    <!-- Logo & Title -->
+    <div class="login-header">
+      <div class="logo-circle">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+      </div>
+      <h1>Willkommen zurück</h1>
+      <p>Melde dich an um fortzufahren</p>
+    </div>
+
+    <!-- Login Form -->
+    <div class="login-form">
+      <div class="input-group">
+        <ion-icon name="mail-outline" class="input-icon"></ion-icon>
+        <ion-input
+          [(ngModel)]="email"
+          type="email"
+          placeholder="Email"
+          class="custom-input"
+          [disabled]="loading"
+        ></ion-input>
+      </div>
+
+      <div class="input-group">
+        <ion-icon name="lock-closed-outline" class="input-icon"></ion-icon>
+        <ion-input
+          [(ngModel)]="password"
+          [type]="showPassword ? 'text' : 'password'"
+          placeholder="Passwort"
+          class="custom-input"
+          [disabled]="loading"
+        ></ion-input>
+        <ion-icon
+          [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+          class="toggle-password"
+          (click)="togglePassword()"
+        ></ion-icon>
+      </div>
+
+      <ion-button
+        expand="block"
+        class="login-button"
+        (click)="login()"
+        [disabled]="!email || !password || loading"
+      >
+        <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+        <span *ngIf="!loading">Anmelden</span>
+      </ion-button>
+
+      <div class="register-link">
+        <p>Noch kein Account? <a routerLink="/register">Registrieren</a></p>
+      </div>
+    </div>
+  </div>
+</ion-content>
