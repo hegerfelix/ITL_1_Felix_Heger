@@ -1,3 +1,12 @@
+/**
+ * @file routes/auth.js
+ * @description Authentifizierungs-Routen: Registrierung, Login, Profil und Token-Verifizierung.
+ * POST /register und POST /login sind öffentlich (kein JWT erforderlich).
+ * GET /profile und GET /verify sind durch passport.authenticate('jwt') geschützt.
+ *
+ * Kursanforderung Endabgabe: Registrierung UND Login mit JWT-Token-Rückgabe
+ */
+
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -9,8 +18,8 @@ require('dotenv').config();
 router.post('/register', async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
-    
-    // Validierung
+
+    // Validierung: alle Felder sind Pflicht (entspricht der Frontend-Prüfung in register.page.ts)
     if (!firstName || !lastName || !email || !password) {
       return res.status(400).json({ error: 'Alle Felder sind erforderlich' });
     }
@@ -21,7 +30,7 @@ router.post('/register', async (req, res) => {
       return res.status(409).json({ error: 'Email bereits registriert' });
     }
 
-    // User erstellen (Passwort wird automatisch gehasht durch beforeCreate Hook)
+    // User erstellen (Passwort wird automatisch gehasht durch beforeCreate Hook in models/user.js)
     const user = await User.create({
       firstName,
       lastName,
@@ -30,6 +39,8 @@ router.post('/register', async (req, res) => {
     });
 
     // JWT Token erstellen
+    // issuer/audience müssen mit den passport.js-Optionen übereinstimmen (gegenseitige Validierung).
+    // expiresIn '7d': Token ist 7 Tage gültig; danach muss sich der User neu anmelden.
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
@@ -40,6 +51,9 @@ router.post('/register', async (req, res) => {
       }
     );
 
+    // token wird direkt in der Antwort zurückgegeben, damit der Client ihn sofort
+    // in @capacitor/preferences speichern kann (kein zweiter Login-Request nötig).
+    // user.toSafeObject() stellt sicher, dass kein Passwort-Hash übertragen wird.
     res.status(201).json({
       message: 'Registrierung erfolgreich',
       token,
@@ -64,16 +78,18 @@ router.post('/login', async (req, res) => {
     // User suchen
     const user = await User.findOne({ where: { email } });
     if (!user) {
+      // Absichtlich identische Fehlermeldung wie bei falschem Passwort:
+      // Angreifer sollen nicht erfahren, ob eine E-Mail-Adresse registriert ist (User Enumeration).
       return res.status(401).json({ error: 'Ungültige Anmeldedaten' });
     }
 
-    // Passwort prüfen
+    // Passwort prüfen (bcrypt.compare via validatePassword-Methode des User-Modells)
     const isValidPassword = await user.validatePassword(password);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Ungültige Anmeldedaten' });
     }
 
-    // JWT Token erstellen
+    // JWT Token erstellen (identische Optionen wie bei /register)
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
@@ -96,7 +112,8 @@ router.post('/login', async (req, res) => {
 });
 
 // GET /api/auth/profile - Geschütztes Profil (benötigt JWT)
-router.get('/profile', 
+// req.user wird von passport mit dem Ergebnis des Verify-Callbacks befüllt (toSafeObject())
+router.get('/profile',
   passport.authenticate('jwt', { session: false }),
   async (req, res) => {
     try {
@@ -111,6 +128,7 @@ router.get('/profile',
 );
 
 // GET /api/auth/verify - Token validieren
+// Wird vom Frontend (AuthService.verifyToken()) genutzt, um abgelaufene Tokens zu erkennen.
 router.get('/verify',
   passport.authenticate('jwt', { session: false }),
   (req, res) => {

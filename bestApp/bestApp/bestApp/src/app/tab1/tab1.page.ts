@@ -1,3 +1,13 @@
+/**
+ * @file tab1.page.ts
+ * @description Haupt-Dashboard der TaxiApp: zeigt alle Benutzer an und erlaubt
+ * CRUD-Operationen (Erstellen, Bearbeiten, Löschen) sowie Logout.
+ *
+ * Kursanforderung Endabgabe: Benutzerdaten werden nach Login/Registrierung angezeigt.
+ * Kursanforderung Teil 3: Verwendet @capacitor/toast (via Ionic ToastController)
+ * für Feedback-Nachrichten nach jeder Operation.
+ */
+
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -15,6 +25,14 @@ import {
 import { UserService, User } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 
+/**
+ * @class Tab1Page
+ * @implements OnInit
+ * @description Standalone-Komponente ohne separates NgModule.
+ * Alle Benutzeroperationen sind durch JWT-Authentifizierung geschützt:
+ * – AuthGuard blockiert unauthentifizierte Zugriffe auf /tabs
+ * – AuthInterceptor hängt Bearer-Token automatisch an jeden HTTP-Request
+ */
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
@@ -33,6 +51,11 @@ export class Tab1Page implements OnInit {
   newUser: User = { firstName: '', lastName: '', email: '' };
   editingUser: User | null = null;
 
+  /**
+   * Farbverläufe für Avatar-Hintergründe.
+   * Modulo-Index (getAvatarColor) stellt sicher, dass die Farben für beliebig viele
+   * Benutzer zyklisch wiederholt werden.
+   */
   private avatarColors = [
     'linear-gradient(135deg, #6c63ff, #3dc2ff)',
     'linear-gradient(135deg, #f093fb, #f5576c)',
@@ -58,10 +81,20 @@ export class Tab1Page implements OnInit {
     this.loadUsers();
   }
 
+  /**
+   * Gibt einen Farbverlauf für den Benutzer-Avatar zurück (deterministisch per Index).
+   * @param index - Position des Benutzers in der Liste
+   * @returns CSS linear-gradient-String
+   */
   getAvatarColor(index: number): string {
     return this.avatarColors[index % this.avatarColors.length];
   }
 
+  /**
+   * Lädt alle Benutzer vom Backend und speichert sie in this.users.
+   * Setzt errorMessage bei Verbindungsfehlern (z.B. Backend nicht gestartet).
+   * Wird bei ngOnInit() und nach jeder Mutation (add/update/delete) aufgerufen.
+   */
   loadUsers() {
     this.loading = true;
     this.errorMessage = '';
@@ -77,6 +110,11 @@ export class Tab1Page implements OnInit {
     });
   }
 
+  /**
+   * Erstellt einen neuen Benutzer-Datensatz über UserService.
+   * Setzt das newUser-Formular nach Erfolg zurück und lädt die Liste neu.
+   * Mindestfelder: firstName und email (Pflicht laut Backend-Validierung).
+   */
   addUser() {
     if (!this.newUser.firstName || !this.newUser.email) {
       this.showToast('Please fill in First Name and Email.', 'warning');
@@ -92,10 +130,20 @@ export class Tab1Page implements OnInit {
     });
   }
 
+  /**
+   * Wechselt in den Bearbeitungsmodus für einen Benutzer.
+   * Spread-Operator { ...user } erstellt eine Kopie, damit Änderungen im Formular
+   * nicht sofort das ursprüngliche Objekt in this.users mutieren (defensive Kopie).
+   * @param user - Der zu bearbeitende Benutzer
+   */
   startEdit(user: User) {
     this.editingUser = { ...user };
   }
 
+  /**
+   * Speichert die Änderungen des bearbeiteten Benutzers und beendet den Bearbeitungsmodus.
+   * Early-Return wenn editingUser oder id fehlt (Sicherheitscheck gegen null-Zugriff).
+   */
   saveEdit() {
     if (!this.editingUser || !this.editingUser.id) return;
     this.userService.updateUser(this.editingUser.id, this.editingUser).subscribe({
@@ -108,10 +156,17 @@ export class Tab1Page implements OnInit {
     });
   }
 
+  /** Verwirft alle Änderungen und beendet den Bearbeitungsmodus ohne API-Aufruf. */
   cancelEdit() {
     this.editingUser = null;
   }
 
+  /**
+   * Zeigt eine Bestätigungs-Alert-Nachricht vor dem Löschen (zweistufige Bestätigung).
+   * Verhindert unbeabsichtigtes Löschen durch einen zusätzlichen Klick.
+   * Die eigentliche Löschung findet im Alert-Handler statt.
+   * @param user - Der zu löschende Benutzer
+   */
   async deleteUser(user: User) {
     const alert = await this.alertCtrl.create({
       header: 'Delete User',
@@ -135,6 +190,13 @@ export class Tab1Page implements OnInit {
     await alert.present();
   }
 
+  /**
+   * Zeigt eine Ionic-Toast-Nachricht am unteren Bildschirmrand.
+   * Kursanforderung: @capacitor/toast für native Benachrichtigungen; hier wird zusätzlich
+   * der Ionic ToastController für farbige Status-Toasts genutzt.
+   * @param message - Anzuzeigender Text
+   * @param color - Ionic-Farbe: 'success', 'danger', 'warning'
+   */
   async showToast(message: string, color: string) {
     const toast = await this.toastCtrl.create({
       message, duration: 2200, color, position: 'bottom',
@@ -143,6 +205,11 @@ export class Tab1Page implements OnInit {
     await toast.present();
   }
 
+  /**
+   * Zeigt eine Abmeldebestätigung und führt bei Bestätigung den Logout durch.
+   * AuthService.logout() entfernt Token + User aus Capacitor Preferences
+   * und setzt den BehaviorSubject zurück. Anschließend Navigation zu /login.
+   */
   async logout() {
     const alert = await this.alertCtrl.create({
       header: 'Abmelden',
