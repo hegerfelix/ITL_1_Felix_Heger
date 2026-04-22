@@ -60,6 +60,8 @@
         ></ion-icon>
       </div>
 
+      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
       <ion-button
         expand="block"
         class="register-button"

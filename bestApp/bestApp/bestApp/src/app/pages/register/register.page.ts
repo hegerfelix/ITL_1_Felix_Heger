@@ -53,6 +53,7 @@ export class RegisterPage {
   password = '';
   showPassword = false;
   loading = false;
+  errorMessage = '';
 
   constructor(
     private authService: AuthService,
@@ -78,6 +79,7 @@ export class RegisterPage {
     }
 
     this.loading = true;
+    this.errorMessage = '';
     this.authService.register({
       firstName: this.firstName,
       lastName: this.lastName,
@@ -90,6 +92,11 @@ export class RegisterPage {
       },
       error: (err) => {
         this.loading = false;
+        if (err.status === 409) {
+          this.errorMessage = 'Diese E-Mail-Adresse ist bereits registriert.';
+        } else {
+          this.errorMessage = 'Registrierung fehlgeschlagen. Bitte versuche es erneut.';
+        }
         console.error('Registration failed:', err);
       }
     });

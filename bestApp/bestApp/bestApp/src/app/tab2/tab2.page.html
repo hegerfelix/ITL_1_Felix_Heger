@@ -1,17 +1,43 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 2
-    </ion-title>
+    <ion-title>🎯 Zahlen-Rate</ion-title>
+    <ion-button slot="end" fill="clear" (click)="newGame()">
+      <ion-icon name="refresh-outline"></ion-icon>
+    </ion-button>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="game-content">
+  <div class="game-container">
+    <div class="game-header">
+      <h1>Rate die Zahl!</h1>
+      <p>Ich denke an eine Zahl zwischen <strong>1</strong> und <strong>100</strong></p>
+    </div>
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+    <div class="attempts-badge">
+      Versuche: {{ attempts }}
+    </div>
+
+    <div *ngIf="!won" class="input-area">
+      <ion-input
+        [(ngModel)]="guess"
+        type="number"
+        placeholder="Deine Zahl..."
+        class="guess-input"
+        (keyup.enter)="submit()"
+      ></ion-input>
+      <ion-button expand="block" class="submit-btn" (click)="submit()" [disabled]="!guess">
+        Raten
+      </ion-button>
+      <p class="hint" *ngIf="hint">{{ hint }}</p>
+    </div>
+
+    <div *ngIf="won" class="win-area">
+      <div class="trophy">🏆</div>
+      <p class="win-message">{{ message }}</p>
+      <ion-button expand="block" class="new-game-btn" (click)="newGame()">
+        Nochmal spielen
+      </ion-button>
+    </div>
+  </div>
 </ion-content>

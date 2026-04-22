@@ -1,17 +1,54 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 3
-    </ion-title>
+    <ion-title>⚡ Reaktionstest</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="reaction-content">
+  <div class="reaction-container">
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+    <div class="best-time" *ngIf="bestTime !== null">
+      🏅 Bestzeit: {{ bestTime }} ms
+    </div>
+
+    <!-- IDLE -->
+    <div *ngIf="state === 'idle'" class="circle circle-idle" (click)="start()">
+      <span>Tippe zum<br>Starten</span>
+    </div>
+
+    <!-- WAITING -->
+    <div *ngIf="state === 'waiting'" class="circle circle-waiting" (click)="tap()">
+      <span>Warte...</span>
+    </div>
+
+    <!-- READY -->
+    <div *ngIf="state === 'ready'" class="circle circle-ready" (click)="tap()">
+      <span>JETZT!</span>
+    </div>
+
+    <!-- RESULT -->
+    <div *ngIf="state === 'result'" class="result-area">
+      <div class="result-time">{{ reactionTime }} ms</div>
+      <p class="result-label">
+        <span *ngIf="reactionTime < 200">Unglaublich schnell! ⚡</span>
+        <span *ngIf="reactionTime >= 200 && reactionTime < 300">Sehr gut! 💪</span>
+        <span *ngIf="reactionTime >= 300 && reactionTime < 450">Gut! 👍</span>
+        <span *ngIf="reactionTime >= 450">Langsam... 🐢</span>
+      </p>
+      <ion-button expand="block" class="retry-btn" (click)="start()">Nochmal</ion-button>
+      <ion-button expand="block" fill="outline" class="reset-btn" (click)="reset()">Zurücksetzen</ion-button>
+    </div>
+
+    <!-- TOO EARLY -->
+    <div *ngIf="state === 'tooearly'" class="result-area">
+      <div class="tooearly-icon">😬</div>
+      <p class="tooearly-text">Zu früh getippt!</p>
+      <ion-button expand="block" class="retry-btn" (click)="start()">Nochmal versuchen</ion-button>
+    </div>
+
+    <p class="hint-text" *ngIf="state === 'idle'">
+      Tippe so schnell wie möglich wenn der Kreis grün wird.
+    </p>
+
+  </div>
 </ion-content>

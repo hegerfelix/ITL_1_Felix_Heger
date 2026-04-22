@@ -1,0 +1,109 @@
+.game-content {
+  --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1.5rem;
+  min-height: 100%;
+}
+
+.game-header {
+  text-align: center;
+  color: white;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+  }
+
+  p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 0;
+  }
+}
+
+.attempts-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.input-area {
+  width: 100%;
+  max-width: 340px;
+
+  ion-input.guess-input {
+    --background: white;
+    --border-radius: 14px;
+    --padding-start: 20px;
+    --padding-top: 14px;
+    --padding-bottom: 14px;
+    --box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .submit-btn {
+    --background: white;
+    --color: #667eea;
+    --border-radius: 14px;
+    --box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    height: 52px;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: none;
+  }
+
+  .hint {
+    text-align: center;
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 1.5rem;
+  }
+}
+
+.win-area {
+  text-align: center;
+  width: 100%;
+  max-width: 340px;
+
+  .trophy {
+    font-size: 80px;
+    margin-bottom: 1rem;
+    animation: bounce 0.6s ease infinite alternate;
+  }
+
+  .win-message {
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 2rem;
+  }
+
+  .new-game-btn {
+    --background: white;
+    --color: #667eea;
+    --border-radius: 14px;
+    height: 52px;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: none;
+  }
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-12px); }
+}
